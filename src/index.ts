@@ -13,20 +13,6 @@ interface Options {
 }
 
 export async function doAttendanceForAccount(token: string, options: Options) {
-  const { code } = await auth(token)
-  let cred, signToken;
-  try {
-    const result = await signIn(code);
-    cred = result.cred;
-    signToken = result.token;
-  } catch (error) {
-    const errorMsg = `签到失败，错误消息: ${error.message}`;
-    combineMessage(errorMsg, true);
-    await excutePushMessage(false);
-    return; // 退出函数
-  }
-  const { list } = await getBinding(cred, signToken)
-
   const createCombinePushMessage = () => {
     const messages: string[] = []
     let hasError = false
@@ -82,7 +68,21 @@ export async function doAttendanceForAccount(token: string, options: Options) {
 
   const [combineMessage, excutePushMessage, addMessage] = createCombinePushMessage()
 
+  const { code } = await auth(token)
+  let cred, signToken;
+  try {
+    const result = await signIn(code);
+    cred = result.cred;
+    signToken = result.token;
+  } catch (error) {
+    const errorMsg = `签到失败，错误消息: ${error.message}`;
+    combineMessage(errorMsg, true);
+    await excutePushMessage(false);
+    return; // 退出函数
+  }
+  const { list } = await getBinding(cred, signToken)
 
+  
   addMessage('## 明日方舟签到')
 
   let successAttendance = 0
